@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>অ্যাড ইমেজ কাস্টমাইজেশনসহ ৩:৪ নিউজ ফটোকার্ড জেনারেটর</title>
+    <title>অটোমেটিক নিউজকার্ড জেনারেটর</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
@@ -39,7 +39,7 @@
         }
 
         h2 {
-            font-size: 20px;
+            font-size: 22px;
             text-align: center;
             color: #38bdf8;
             margin-top: 5px;
@@ -52,12 +52,13 @@
             width: 100%;
             max-width: 1100px;
             margin-top: 10px;
+            flex: 1;
         }
 
         @media (min-width: 850px) {
             .workspace {
                 grid-template-columns: 1.1fr 0.9fr;
-                height: calc(100vh - 80px);
+                height: calc(100vh - 140px);
                 align-items: start;
             }
         }
@@ -174,11 +175,7 @@
             margin-top: 10px;
         }
 
-        .btn-download:active {
-            transform: scale(0.98);
-        }
-
-        /* --- ৩:৪ ফিক্সড প্রিভিউ এরিয়া --- */
+        /* --- ১:১ ফিক্সড প্রিভিউ এরিয়া --- */
         .preview-box {
             display: flex;
             flex-direction: column;
@@ -191,21 +188,21 @@
             position: relative;
             width: 100%;
             overflow: hidden;
-            min-height: 400px;
+            min-height: 450px;
         }
 
         .card-wrapper {
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
         }
 
-        .photocard-3-4 {
-            width: 450px;
-            height: 600px;
+        .photocard-1-1 {
+            width: 500px;
+            height: 500px;
             background-color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -223,6 +220,16 @@
             background-color: #334155;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .news-image-area .placeholder-text {
+            color: #94a3b8;
+            font-size: 14px;
+            position: absolute;
+            z-index: 1;
         }
 
         .news-image-area img#cardImg {
@@ -232,14 +239,15 @@
             position: absolute;
             top: 0;
             left: 0;
+            z-index: 2;
         }
 
         .watermark-logo {
             position: absolute;
             top: 15px;
             right: 15px;
-            max-height: 45px;
-            max-width: 120px;
+            max-height: 40px;
+            max-width: 110px;
             object-fit: contain;
             opacity: 0.9;
             display: none;
@@ -250,8 +258,8 @@
         .meta-bar {
             background-color: #8b0000;
             color: #ffffff;
-            padding: 9px 18px;
-            font-size: 13px;
+            padding: 8px 18px;
+            font-size: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -261,27 +269,32 @@
         /* ৩. হেডলাইন সেকশন */
         .headline-section {
             background-color: #f8fafc;
-            padding: 15px 20px;
+            padding: 10px 18px;
             flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            border-bottom: 6px solid #8b0000;
+            border-bottom: 5px solid #8b0000;
         }
 
         .headline-text {
-            font-size: 24px;
+            font-size: 22px;
             color: #000000;
             line-height: 1.4;
             width: 100%;
             word-wrap: break-word;
         }
+        
+        .headline-text.placeholder-active {
+            color: #94a3b8;
+            font-style: italic;
+        }
 
-        /* ৪. আপগ্রেডেড স্মার্ট বিজ্ঞাপন সেকশন */
+        /* ৪. বিজ্ঞাপন সেকশন */
         .ad-section {
             background-color: #ffffff;
-            height: 12%;
+            height: 15%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -290,18 +303,16 @@
             border-top: 1px dashed #cbd5e1;
         }
 
-        /* কাস্টম ফুল এড ইমেজ লেআউট */
         .ad-full-image {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* পুরো এরিয়া জুড়ে ইমেজ সেট করার জন্য */
+            object-fit: fill;
             display: none;
         }
 
-        /* ডিফল্ট টেক্সট লেআউট কনটেইনার */
         .ad-text-wrapper {
             width: 100%;
-            padding: 10px 15px;
+            padding: 6px 15px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -309,11 +320,11 @@
         }
 
         .ad-logo-slot {
-            width: 45px;
-            height: 45px;
+            width: 42px;
+            height: 42px;
             background-color: #f1f5f9;
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
+            border-radius: 4px;
             display: none;
             align-items: center;
             justify-content: center;
@@ -333,6 +344,7 @@
             justify-content: center;
             flex-grow: 1;
             text-align: center;
+            gap: 1px;
         }
 
         .ad-section.has-logo .ad-text-container {
@@ -340,23 +352,47 @@
         }
 
         .ad-brand {
-            font-size: 17px;
+            font-size: 15px;
             font-weight: bold;
             color: #1e3a8a;
             line-height: 1.2;
         }
 
         .ad-text {
-            font-size: 12px;
+            font-size: 11px;
             color: #16a34a;
-            margin-top: 2px;
             line-height: 1.2;
+        }
+
+        .ad-extra-text {
+            font-size: 10px;
+            color: #64748b;
+            line-height: 1.2;
+        }
+
+        /* --- ওয়েবসাইটের মূল ফুটার --- */
+        .site-footer {
+            width: 100%;
+            max-width: 1100px;
+            text-align: center;
+            padding: 15px 0 5px 0;
+            color: #64748b;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            border-top: 1px solid #1e293b;
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .site-footer span {
+            color: #38bdf8;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h2>স্টেবল ৩:৪ নিউজ ফটোকার্ড জেনারেটর (অ্যাড ইমেজ সাপোর্টেড)</h2>
+    <h2>১:১ নিউজ ফটোকার্ড জেনারেটর (লাইভ ডেট ইঞ্জিন)</h2>
 
     <div class="workspace">
         <div class="panel">
@@ -367,7 +403,7 @@
                     <input type="file" id="uploadImg" accept="image/*">
                 </div>
                 <div class="input-group">
-                    <label>নিуз লোগো (PNG)</label>
+                    <label>নিউজ লোগো (PNG)</label>
                     <input type="file" id="uploadLogo" accept="image/*">
                 </div>
             </div>
@@ -375,17 +411,17 @@
             <div class="row-grid">
                 <div class="input-group">
                     <label>নিউজ হাউজ</label>
-                    <input type="text" id="inHouse" value="কয়রা সাংবাদিক ফোরাম">
+                    <input type="text" id="inHouse" value="কয়রা সাংবাদিক ফোরাম">
                 </div>
                 <div class="input-group">
-                    <label>তারিখ ও বার</label>
-                    <input type="text" id="inDate" value="০৬ জুন, ২০২৬ | শনিবার">
+                    <label>তারিখ ও বার (স্বয়ংক্রিয়)</label>
+                    <input type="text" id="inDate" value="">
                 </div>
             </div>
 
             <div class="input-group">
-                <label>সংবাদের শিরোনাম</label>
-                <textarea id="inHeadline" rows="2">শাশুড়িকে হত্যা দেখতে পেয়ে দুই শিশুকেও হত্যা, আদালতে সৎ বাবার স্বীকারোক্তি</textarea>
+                <label>সংবাদের শিরোনাম (ফাঁকা রাখলে ডেমো দেখাবে)</label>
+                <textarea id="inHeadline" rows="2" placeholder="এখানে সংবাদের মূল শিরোনাম লিখুন..."></textarea>
             </div>
 
             <div class="row-grid">
@@ -394,12 +430,12 @@
                     <select id="selectFont">
                         <option value="Kalpurush" selected>কালপুরুষ (Kalpurush)</option>
                         <option value="SolaimanLipi">সোলাইমানলিপি (SolaimanLipi)</option>
-                        <option value="Hind Siliguri">হিন্দ শিলিগুড়ি</option>
+                        <option value="Hind Siliguri">হিন্দ শিলিগুড়ি</option>
                     </select>
                 </div>
                 <div class="input-group">
                     <label>শিরোনাম সাইজ</label>
-                    <input type="range" id="sizeHeadline" min="16" max="36" value="24">
+                    <input type="range" id="sizeHeadline" min="16" max="36" value="22">
                 </div>
             </div>
 
@@ -407,25 +443,31 @@
             <div class="row-grid">
                 <div class="input-group">
                     <label>জুম: <span id="zoomVal">1.0x</span></label>
-                    <input type="range" id="imgZoom" min="1" max="2.5" step="0.05" value="1">
+                    <input type="range" id="imgZoom" min="1" max="3" step="0.05" value="1">
                 </div>
                 <div class="input-group">
-                    <label>সরান (Y-Pos)</label>
-                    <input type="range" id="imgY" min="-100" max="100" step="1" value="0">
+                    <label>সরান Y (Vertical)</label>
+                    <input type="range" id="imgY" min="0" max="100" step="1" value="50">
                 </div>
             </div>
             <div class="row-grid">
+                <div class="input-group">
+                    <label>সরান X (Horizontal)</label>
+                    <input type="range" id="imgX" min="0" max="100" step="1" value="50">
+                </div>
                 <div class="color-picker-box">
                     <label>থিম বার</label>
                     <input type="color" id="colorTheme" value="#8b0000">
                 </div>
+            </div>
+            <div class="row-grid">
                 <div class="color-picker-box">
                     <label>শিরোনাম BG</label>
                     <input type="color" id="colorHeadlineBg" value="#f8fafc">
                 </div>
             </div>
 
-            <h3>৩. বিজ্ঞাপন সেকশন (টেক্সট / ছবি আপলোড)</h3>
+            <h3>৩. বিজ্ঞাপন কাস্টমাইজেশন (৩টি টেক্সট লাইন অপশন)</h3>
             <div class="input-group" style="flex-direction: row; gap: 8px; align-items: center;">
                 <input type="checkbox" id="toggleAd" checked style="width: 16px; height: 16px;">
                 <label for="toggleAd" style="color: #38bdf8; cursor: pointer; font-weight: bold;">বিজ্ঞাপন ডিসপ্লে অন রাখুন</label>
@@ -439,15 +481,17 @@
                 </div>
 
                 <div id="adTextInputsGroup" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div class="row-grid">
-                        <div class="input-group">
-                            <label>কোম্পানির নাম (Brand)</label>
-                            <input type="text" id="inAdBrand" value="কয়রা সার্জিক্যাল এন্ড ডায়াগনস্টিক সেন্টার">
-                        </div>
-                        <div class="input-group">
-                            <label>স্লোগান / বিবরণ</label>
-                            <input type="text" id="inAdText" value="নিখুঁত পরীক্ষা ও আধুনিক সেবার নির্ভরযোগ্য প্রতিষ্ঠান">
-                        </div>
+                    <div class="input-group">
+                        <label>১ম লাইন: কোম্পানির নাম (Brand)</label>
+                        <input type="text" id="inAdBrand" value="কয়রা সার্জিক্যাল এন্ড ডায়াগনস্টিক সেন্টার">
+                    </div>
+                    <div class="input-group">
+                        <label>২য় লাইন: স্লোগান / প্রধান বিবরণ</label>
+                        <input type="text" id="inAdText" value="নিখুঁত পরীক্ষা ও আধুনিক সেবার নির্ভরযোগ্য প্রতিষ্ঠান">
+                    </div>
+                    <div class="input-group">
+                        <label>৩য় লাইন: অতিরিক্ত তথ্য / ঠিকানা / মোবাইল</label>
+                        <input type="text" id="inAdExtraText" value="যোগাযোগ: ০১৭১২-XXXXXX, তিন রাস্তার মোড়, কয়রা।">
                     </div>
 
                     <div class="row-grid">
@@ -457,7 +501,7 @@
                         </div>
                         <div class="input-group">
                             <label>ব্র্যান্ড নাম সাইজ</label>
-                            <input type="range" id="sizeAdBrand" min="12" max="24" value="17">
+                            <input type="range" id="sizeAdBrand" min="12" max="22" value="15">
                         </div>
                     </div>
 
@@ -467,18 +511,18 @@
                             <input type="color" id="colorAdBg" value="#ffffff">
                         </div>
                         <div class="color-picker-box">
-                            <label>ব্র্যান্ড টেক্সট</label>
+                            <label>১ম লাইন কালার</label>
                             <input type="color" id="colorAdBrand" value="#1e3a8a">
                         </div>
                     </div>
                     <div class="row-grid">
                         <div class="color-picker-box">
-                            <label>স্লোগান টেক্সট</label>
+                            <label>২য় লাইন কালার</label>
                             <input type="color" id="colorAdText" value="#16a34a">
                         </div>
-                        <div class="input-group">
-                            <label>স্লোগান সাইজ</label>
-                            <input type="range" id="sizeAdText" min="10" max="18" value="12">
+                        <div class="color-picker-box">
+                            <label>৩য় লাইন কালার</label>
+                            <input type="color" id="colorAdExtra" value="#64748b">
                         </div>
                     </div>
                 </div>
@@ -488,22 +532,23 @@
         </div>
 
         <div class="preview-box">
-            <span style="font-weight: 600; color: #94a3b8; font-size: 13px; margin-bottom: 10px;">লাইভ এডিটর প্রিভিউ</span>
+            <span style="font-weight: 600; color: #94a3b8; font-size: 13px; margin-bottom: 10px;">লাইভ এডিটর প্রিভিউ (১:১ স্কয়ার)</span>
             
             <div class="card-wrapper" id="cardWrapper">
-                <div class="photocard-3-4" id="targetCard">
+                <div class="photocard-1-1" id="targetCard">
                     <div class="news-image-area" id="domImageArea">
+                        <span class="placeholder-text" id="placeholderTxt">কোনো ছবি সিলেক্ট করা হয়নি</span>
                         <img id="cardImg" src="" alt="" style="display: none;">
                         <img id="cardLogo" class="watermark-logo" src="" alt="Logo">
                     </div>
                     
                     <div class="meta-bar" id="domMetaBar">
-                        <span id="cardDate">০৬ জুন, ২০২৬ | শনিবার</span>
-                        <span id="cardHouse" style="background: rgba(255,255,255,0.18); padding: 2px 8px; border-radius: 4px;">কয়রা সাংবাদিক ফোরাম</span>
+                        <span id="cardDate"></span>
+                        <span id="cardHouse" style="background: rgba(255,255,255,0.18); padding: 2px 8px; border-radius: 4px;">কয়রা সাংবাদিক ফোরাম</span>
                     </div>
                     
                     <div class="headline-section" id="domHeadlineSec">
-                        <div class="headline-text" id="cardHeadline">শাশুড়িকে হত্যা দেখতে পেয়ে দুই শিশুকেও হত্যা, আদালতে সৎ বাবার স্বীকারোক্তি</div>
+                        <div class="headline-text" id="cardHeadline">এখানে সংবাদের মূল শিরোনাম লিখুন...</div>
                     </div>
                     
                     <div class="ad-section" id="domAdSec">
@@ -514,8 +559,9 @@
                                 <img id="cardAdLogo" src="" alt="Ad Logo">
                             </div>
                             <div class="ad-text-container">
-                                <div class="ad-brand" id="cardAdBrand">কয়রা সার্জিক্যাল এন্ড ডায়াগনস্টিক সেন্টার</div>
+                                <div class="ad-brand" id="cardAdBrand">কয়রা সার্জিক্যাল এন্ড ডায়াগনস্টিক সেন্টার</div>
                                 <div class="ad-text" id="cardAdText">নিখুঁত পরীক্ষা ও আধুনিক সেবার নির্ভরযোগ্য প্রতিষ্ঠান</div>
+                                <div class="ad-extra-text" id="cardAdExtraText">যোগাযোগ: ০১৭১২-XXXXXX, তিন রাস্তার মোড়, কয়রা।</div>
                             </div>
                         </div>
                     </div>
@@ -524,19 +570,43 @@
         </div>
     </div>
 
+    <div class="site-footer">
+        Developed By: <span>Mekail Biswas</span>
+    </div>
+
     <script>
-        // ডম এলিমেন্ট রেফারেন্স
+        // অটো-ডেট ইঞ্জিন ফাংশন
+        function getBanglaCurrentDate() {
+            const date = new Date();
+            
+            const engMonths = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+            const engDays = ["রবিবার", "সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার", "শুক্রবার", "শনিবার"];
+            const banglaNumerals = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
+
+            const replaceNumbers = (num) => String(num).split('').map(digit => banglaNumerals[digit] || digit).join('');
+
+            const day = replaceNumbers(String(date.getDate()).padStart(2, '0'));
+            const month = engMonths[date.getMonth()];
+            const year = replaceNumbers(date.getFullYear());
+            const dayName = engDays[date.getDay()];
+
+            return `${day} ${month}, ${year} | ${dayName}`;
+        }
+
+        // এলিমেন্ট রেফারেন্স
         const uploadImg = document.getElementById('uploadImg');
         const uploadLogo = document.getElementById('uploadLogo');
         const uploadAdLogo = document.getElementById('uploadAdLogo');
         const uploadAdImg = document.getElementById('uploadAdImg');
         const btnRemoveAdImg = document.getElementById('btnRemoveAdImg');
+        const placeholderTxt = document.getElementById('placeholderTxt');
         
         const inHouse = document.getElementById('inHouse');
         const inDate = document.getElementById('inDate');
         const inHeadline = document.getElementById('inHeadline');
         const inAdBrand = document.getElementById('inAdBrand');
         const inAdText = document.getElementById('inAdText');
+        const inAdExtraText = document.getElementById('inAdExtraText');
 
         const cardImg = document.getElementById('cardImg');
         const cardLogo = document.getElementById('cardLogo');
@@ -547,6 +617,7 @@
         const cardHeadline = document.getElementById('cardHeadline');
         const cardAdBrand = document.getElementById('cardAdBrand');
         const cardAdText = document.getElementById('cardAdText');
+        const cardAdExtraText = document.getElementById('cardAdExtraText');
 
         const domImageArea = document.getElementById('domImageArea');
         const domMetaBar = document.getElementById('domMetaBar');
@@ -555,9 +626,9 @@
         const domAdLogoSlot = document.getElementById('domAdLogoSlot');
         const domAdTextWrapper = document.getElementById('domAdTextWrapper');
 
-        // কন্ট্রোল এলিমেন্ট রেফারেন্স
         const imgZoom = document.getElementById('imgZoom');
         const imgY = document.getElementById('imgY');
+        const imgX = document.getElementById('imgX');
         const colorTheme = document.getElementById('colorTheme');
         const colorHeadlineBg = document.getElementById('colorHeadlineBg');
         
@@ -567,17 +638,36 @@
         const colorAdBg = document.getElementById('colorAdBg');
         const colorAdBrand = document.getElementById('colorAdBrand');
         const colorAdText = document.getElementById('colorAdText');
+        const colorAdExtra = document.getElementById('colorAdExtra');
         const sizeAdBrand = document.getElementById('sizeAdBrand');
-        const sizeAdText = document.getElementById('sizeAdText');
         const selectFont = document.getElementById('selectFont');
         const sizeHeadline = document.getElementById('sizeHeadline');
+
+        // লোড হওয়ার সাথে সাথে ডিফল্ট সিস্টেম ডেট বসানো
+        const defaultLiveDate = getBanglaCurrentDate();
+        inDate.value = defaultLiveDate;
+        cardDate.innerText = defaultLiveDate;
+
+        // ডাইনামিক হেডলাইন হ্যান্ডলার
+        function updateHeadline() {
+            const value = inHeadline.value.trim();
+            if (value === "") {
+                cardHeadline.innerText = "এখানে সংবাদের মূল শিরোনাম লিখুন...";
+                cardHeadline.classList.add('placeholder-active');
+            } else {
+                cardHeadline.innerText = value;
+                cardHeadline.classList.remove('placeholder-active');
+            }
+        }
+        inHeadline.addEventListener('input', updateHeadline);
+        updateHeadline();
 
         // লাইভ টেক্সট বাইন্ডিং
         inHouse.addEventListener('input', () => cardHouse.innerText = inHouse.value);
         inDate.addEventListener('input', () => cardDate.innerText = inDate.value);
-        inHeadline.addEventListener('input', () => cardHeadline.innerText = inHeadline.value);
         inAdBrand.addEventListener('input', () => cardAdBrand.innerText = inAdBrand.value);
         inAdText.addEventListener('input', () => cardAdText.innerText = inAdText.value);
+        inAdExtraText.addEventListener('input', () => cardAdExtraText.innerText = inAdExtraText.value);
 
         // কালার ও ফন্ট সিঙ্ক
         colorTheme.addEventListener('input', () => {
@@ -592,18 +682,20 @@
         colorAdBg.addEventListener('input', () => domAdSec.style.backgroundColor = colorAdBg.value);
         colorAdBrand.addEventListener('input', () => cardAdBrand.style.color = colorAdBrand.value);
         colorAdText.addEventListener('input', () => cardAdText.style.color = colorAdText.value);
+        colorAdExtra.addEventListener('input', () => cardAdExtraText.style.color = colorAdExtra.value);
         sizeAdBrand.addEventListener('input', () => cardAdBrand.style.fontSize = sizeAdBrand.value + 'px');
-        sizeAdText.addEventListener('input', () => cardAdText.style.fontSize = sizeAdText.value + 'px');
 
-        // ইমেজ ক্রপিং
+        // ইমেজ পজিশনিং ইঞ্জিন
         function updateImageTransform() {
-            cardImg.style.transform = `scale(${imgZoom.value}) translateY(${imgY.value}px)`;
+            cardImg.style.transform = `scale(${imgZoom.value})`;
+            cardImg.style.objectPosition = `${imgX.value}% ${imgY.value}%`;
             document.getElementById('zoomVal').innerText = imgZoom.value + 'x';
         }
         imgZoom.addEventListener('input', updateImageTransform);
         imgY.addEventListener('input', updateImageTransform);
+        imgX.addEventListener('input', updateImageTransform);
 
-        // বিজ্ঞাপন সেকশন অন/অফ
+        // বিজ্ঞাপন অন/অফ লেআউট রি-ব্যালেন্স
         toggleAd.addEventListener('change', function() {
             if (this.checked) {
                 domAdSec.style.display = 'flex';
@@ -611,13 +703,13 @@
                 adInputsSection.style.display = 'flex';
             } else {
                 domAdSec.style.display = 'none';
-                domImageArea.style.height = '58%';
+                domImageArea.style.height = '62%';
                 adInputsSection.style.display = 'none';
             }
             resizePreviewCard();
         });
 
-        /* --- 🔒 ইমেজ প্রোসেসিং ইঞ্জিন (CORS ফিক্সড) --- */
+        /* --- ফাইল রিডার লজিক --- */
         uploadImg.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
@@ -625,6 +717,7 @@
                 reader.onload = (e) => {
                     cardImg.src = e.target.result;
                     cardImg.style.display = 'block';
+                    placeholderTxt.style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
@@ -655,23 +748,21 @@
             }
         });
 
-        /* --- 📢 কাস্টম বিজ্ঞাপন ইমেজ আপলোড ইঞ্জিন --- */
         uploadAdImg.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     cardAdFullImg.src = e.target.result;
-                    cardAdFullImg.style.display = 'block'; // ইমেজ অন হবে
-                    domAdTextWrapper.style.display = 'none'; // টেক্সট অফ হবে
-                    btnRemoveAdImg.style.display = 'inline-block'; // রিমুভ বাটন শো
-                    adTextInputsGroup.style.opacity = '0.4'; // টেক্সট এডিটর ডিজেবল ফিল
+                    cardAdFullImg.style.display = 'block';
+                    domAdTextWrapper.style.display = 'none';
+                    btnRemoveAdImg.style.display = 'inline-block';
+                    adTextInputsGroup.style.opacity = '0.4';
                 }
                 reader.readAsDataURL(file);
             }
         });
 
-        // বিজ্ঞাপন ইমেজ রিমুভ লজিক
         btnRemoveAdImg.addEventListener('click', function() {
             uploadAdImg.value = '';
             cardAdFullImg.src = '';
@@ -681,21 +772,20 @@
             adTextInputsGroup.style.opacity = '1';
         });
 
-
-        /* স্ক্রিন ফিটিং রেসপনসিভ ইঞ্জিন */
+        /* স্ক্রিন রেসপনসিভ ইঞ্জিন */
         function resizePreviewCard() {
             const wrapper = document.getElementById('cardWrapper');
             const card = document.getElementById('targetCard');
             const wrapperWidth = wrapper.offsetWidth;
             
-            if (wrapperWidth < 450) {
-                const scaleFactor = wrapperWidth / 450;
+            if (wrapperWidth < 500) {
+                const scaleFactor = wrapperWidth / 500;
                 card.style.transform = `scale(${scaleFactor})`;
                 card.style.transformOrigin = 'center center';
-                wrapper.style.height = (600 * scaleFactor) + 'px';
+                wrapper.style.height = (500 * scaleFactor) + 'px';
             } else {
                 card.style.transform = 'none';
-                wrapper.style.height = '600px';
+                wrapper.style.height = '500px';
             }
         }
 
@@ -707,20 +797,31 @@
         function exportResponsiveCard() {
             const card = document.getElementById('targetCard');
             const currentTransform = card.style.transform;
+            
+            const isPlaceholder = cardHeadline.classList.contains('placeholder-active');
+            if (isPlaceholder) {
+                cardHeadline.innerText = "";
+            }
+            
             card.style.transform = 'none';
             
             document.fonts.ready.then(() => {
                 html2canvas(card, {
                     scale: 3, 
-                    useCORS: false,
-                    allowTaint: true,
+                    useCORS: true,
+                    allowTaint: false,
                     logging: false
                 }).then(canvas => {
                     const downloadLink = document.createElement('a');
-                    downloadLink.download = 'AdImage_NewsCard_' + Date.now() + '.png';
+                    downloadLink.download = 'NewsCard_1x1_' + Date.now() + '.png';
                     downloadLink.href = canvas.toDataURL('image/png');
                     downloadLink.click();
+                    
                     card.style.transform = currentTransform;
+                    if (isPlaceholder) {
+                        cardHeadline.innerText = "এখানে সংবাদের মূল শিরোনাম লিখুন...";
+                    }
+                    resizePreviewCard();
                 });
             });
         }
