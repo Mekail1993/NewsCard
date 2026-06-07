@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>অটোমেটিক নিউজকার্ড জেনারেটর</title>
+    <title>নিখুঁত এক্সপোর্ট ইঞ্জিনসহ ১:১ নিউজ ফটোকার্ড জেনারেটর</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
@@ -392,7 +392,7 @@
 </head>
 <body>
 
-    <h2>১:১ নিউজ ফটোকার্ড জেনারেটর (লাইভ ডেট ইঞ্জিন)</h2>
+    <h2>১:১ নিউজ ফটোকার্ড জেনারেটর</h2>
 
     <div class="workspace">
         <div class="panel">
@@ -575,21 +575,17 @@
     </div>
 
     <script>
-        // অটো-ডেট ইঞ্জিন ফাংশন
         function getBanglaCurrentDate() {
             const date = new Date();
-            
             const engMonths = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
             const engDays = ["রবিবার", "সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার", "শুক্রবার", "শনিবার"];
             const banglaNumerals = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
-
             const replaceNumbers = (num) => String(num).split('').map(digit => banglaNumerals[digit] || digit).join('');
-
+            
             const day = replaceNumbers(String(date.getDate()).padStart(2, '0'));
             const month = engMonths[date.getMonth()];
             const year = replaceNumbers(date.getFullYear());
             const dayName = engDays[date.getDay()];
-
             return `${day} ${month}, ${year} | ${dayName}`;
         }
 
@@ -643,12 +639,10 @@
         const selectFont = document.getElementById('selectFont');
         const sizeHeadline = document.getElementById('sizeHeadline');
 
-        // লোড হওয়ার সাথে সাথে ডিফল্ট সিস্টেম ডেট বসানো
         const defaultLiveDate = getBanglaCurrentDate();
         inDate.value = defaultLiveDate;
         cardDate.innerText = defaultLiveDate;
 
-        // ডাইনামিক হেডলাইন হ্যান্ডলার
         function updateHeadline() {
             const value = inHeadline.value.trim();
             if (value === "") {
@@ -662,14 +656,12 @@
         inHeadline.addEventListener('input', updateHeadline);
         updateHeadline();
 
-        // লাইভ টেক্সট বাইন্ডিং
         inHouse.addEventListener('input', () => cardHouse.innerText = inHouse.value);
         inDate.addEventListener('input', () => cardDate.innerText = inDate.value);
         inAdBrand.addEventListener('input', () => cardAdBrand.innerText = inAdBrand.value);
         inAdText.addEventListener('input', () => cardAdText.innerText = inAdText.value);
         inAdExtraText.addEventListener('input', () => cardAdExtraText.innerText = inAdExtraText.value);
 
-        // কালার ও ফন্ট সিঙ্ক
         colorTheme.addEventListener('input', () => {
             domMetaBar.style.backgroundColor = colorTheme.value;
             domHeadlineSec.style.borderBottomColor = colorTheme.value;
@@ -678,14 +670,12 @@
         selectFont.addEventListener('change', () => document.getElementById('targetCard').style.fontFamily = `"${selectFont.value}", sans-serif`);
         sizeHeadline.addEventListener('input', () => cardHeadline.style.fontSize = sizeHeadline.value + 'px');
 
-        // বিজ্ঞাপন ডিজাইন কন্ট্রোল
         colorAdBg.addEventListener('input', () => domAdSec.style.backgroundColor = colorAdBg.value);
         colorAdBrand.addEventListener('input', () => cardAdBrand.style.color = colorAdBrand.value);
         colorAdText.addEventListener('input', () => cardAdText.style.color = colorAdText.value);
         colorAdExtra.addEventListener('input', () => cardAdExtraText.style.color = colorAdExtra.value);
         sizeAdBrand.addEventListener('input', () => cardAdBrand.style.fontSize = sizeAdBrand.value + 'px');
 
-        // ইমেজ পজিশনিং ইঞ্জিন
         function updateImageTransform() {
             cardImg.style.transform = `scale(${imgZoom.value})`;
             cardImg.style.objectPosition = `${imgX.value}% ${imgY.value}%`;
@@ -695,7 +685,6 @@
         imgY.addEventListener('input', updateImageTransform);
         imgX.addEventListener('input', updateImageTransform);
 
-        // বিজ্ঞাপন অন/অফ লেআউট রি-ব্যালেন্স
         toggleAd.addEventListener('change', function() {
             if (this.checked) {
                 domAdSec.style.display = 'flex';
@@ -709,7 +698,6 @@
             resizePreviewCard();
         });
 
-        /* --- ফাইল রিডার লজিক --- */
         uploadImg.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
@@ -772,7 +760,6 @@
             adTextInputsGroup.style.opacity = '1';
         });
 
-        /* স্ক্রিন রেসপনসিভ ইঞ্জিন */
         function resizePreviewCard() {
             const wrapper = document.getElementById('cardWrapper');
             const card = document.getElementById('targetCard');
@@ -793,35 +780,49 @@
         window.addEventListener('load', resizePreviewCard);
         setTimeout(resizePreviewCard, 300);
 
-        // হাই-কোয়ালিটি এক্সপোর্ট ইঞ্জিন
+        // --- আপডেটকৃত হাই-কোয়ালিটি এক্সপোর্ট ইঞ্জিন ---
         function exportResponsiveCard() {
             const card = document.getElementById('targetCard');
-            const currentTransform = card.style.transform;
             
+            // ১. শিরোনাম প্লেসহোল্ডার ক্লিয়ারেন্স
             const isPlaceholder = cardHeadline.classList.contains('placeholder-active');
-            if (isPlaceholder) {
-                cardHeadline.innerText = "";
-            }
+            if (isPlaceholder) cardHeadline.innerText = "";
             
-            card.style.transform = 'none';
-            
+            // ২. ফন্ট এবং ইমেজ কমপ্লিটলি লোড হওয়ার জন্য অপেক্ষা
             document.fonts.ready.then(() => {
+                // ৩. সিএসএস স্কেল ট্র্যান্সফর্মের বাগ এড়াতে একটি ডামি কন্টেইনার মেকানিজম ব্যবহার
+                const originalParent = card.parentNode;
+                const originalTransform = card.style.transform;
+                
+                // এক্সপোর্ট করার জন্য সাময়িকভাবে ট্র্যান্সফর্ম রিসেট
+                card.style.transform = 'none';
+                
                 html2canvas(card, {
-                    scale: 3, 
-                    useCORS: true,
+                    scale: 3,                 // ৩ গুণ শার্পনেস বৃদ্ধি (Ultra HD)
+                    useCORS: true,            // ক্রস-অরিজিন ইমেজ সাপোর্ট
                     allowTaint: false,
-                    logging: false
+                    logging: false,
+                    backgroundColor: null,
+                    scrollX: 0,               // স্ক্রলজনিত অফসেট ফিক্স
+                    scrollY: 0,
+                    width: 500,               // নির্দিষ্ট ফিক্সড উইডথ
+                    height: 500               // নির্দিষ্ট ফিক্সড হাইট
                 }).then(canvas => {
+                    // ৪. ইমেজ ডাউনলোড লিংক তৈরি
                     const downloadLink = document.createElement('a');
                     downloadLink.download = 'NewsCard_1x1_' + Date.now() + '.png';
                     downloadLink.href = canvas.toDataURL('image/png');
                     downloadLink.click();
                     
-                    card.style.transform = currentTransform;
+                    // ৫. কার্ডের আগের সিএসএস লেআউট ও প্রিভিউ ফিরিয়ে আনা
+                    card.style.transform = originalTransform;
                     if (isPlaceholder) {
                         cardHeadline.innerText = "এখানে সংবাদের মূল শিরোনাম লিখুন...";
                     }
                     resizePreviewCard();
+                }).catch(err => {
+                    console.error("Export Failed: ", err);
+                    card.style.transform = originalTransform;
                 });
             });
         }
