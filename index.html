@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>নিখুঁত এক্সপোর্ট ইঞ্জিনসহ ১:১ নিউজ ফটোকার্ড জেনারেটর</title>
+    <title>১:১ নিউজ ফটোকার্ড জেনারেটর (নিখুঁত ইমেজ রেশিও ফিক্স)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
@@ -161,7 +161,7 @@
         }
 
         .btn-download {
-            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
             color: white;
             padding: 14px;
             border: none;
@@ -170,7 +170,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.1s;
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
             width: 100%;
             margin-top: 10px;
         }
@@ -210,14 +210,16 @@
             position: relative;
             flex-shrink: 0;
             font-family: 'Kalpurush', sans-serif;
-            will-change: transform;
         }
 
-        /* ১. ইমেজ সেকশন */
+        /* ১. ইমেজ সেকশন (চ্যাপ্টা হওয়া রোধ করতে ব্যাকগ্রাউন্ড মেথড ব্যবহার) */
         .news-image-area {
             width: 100%;
             height: 52%;
             background-color: #334155;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover; /* এটি ছবির অরিজিনাল রেশিও লক রাখে */
             position: relative;
             overflow: hidden;
             display: flex;
@@ -230,16 +232,6 @@
             font-size: 14px;
             position: absolute;
             z-index: 1;
-        }
-
-        .news-image-area img#cardImg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 2;
         }
 
         .watermark-logo {
@@ -388,6 +380,16 @@
             color: #38bdf8;
             font-weight: bold;
         }
+
+        /* হিডেন এক্সপোর্ট এরিয়া */
+        #hidden-export-container {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 500px;
+            height: 500px;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -442,8 +444,8 @@
             <h3>②. ইমেজ পজিশন ও বেসিক কালার</h3>
             <div class="row-grid">
                 <div class="input-group">
-                    <label>জুম: <span id="zoomVal">1.0x</span></label>
-                    <input type="range" id="imgZoom" min="1" max="3" step="0.05" value="1">
+                    <label>জুম: <span id="zoomVal">100%</span></label>
+                    <input type="range" id="imgZoom" min="100" max="300" step="5" value="100">
                 </div>
                 <div class="input-group">
                     <label>সরান Y (Vertical)</label>
@@ -528,7 +530,7 @@
                 </div>
             </div>
 
-            <button class="btn-download" onclick="exportResponsiveCard()">ফটোকার্ড ডাউনলোড করুন</button>
+            <button class="btn-download" onclick="exportUltraHQExactCard()">হাই-কোয়ালিটি ফটোকার্ড ডাউনলোড করুন</button>
         </div>
 
         <div class="preview-box">
@@ -536,9 +538,9 @@
             
             <div class="card-wrapper" id="cardWrapper">
                 <div class="photocard-1-1" id="targetCard">
+                    <!-- জুম ও পজিশন ডাইরেক্টলি এই ডিভের ব্যাকগ্রাউন্ডে সেট হবে -->
                     <div class="news-image-area" id="domImageArea">
                         <span class="placeholder-text" id="placeholderTxt">কোনো ছবি সিলেক্ট করা হয়নি</span>
-                        <img id="cardImg" src="" alt="" style="display: none;">
                         <img id="cardLogo" class="watermark-logo" src="" alt="Logo">
                     </div>
                     
@@ -570,6 +572,8 @@
         </div>
     </div>
 
+    <div id="hidden-export-container"></div>
+
     <div class="site-footer">
         Developed By: <span>Mekail Biswas</span>
     </div>
@@ -589,7 +593,8 @@
             return `${day} ${month}, ${year} | ${dayName}`;
         }
 
-        // এলিমেন্ট রেফারেন্স
+        let uploadedImageBase64 = ""; // আপলোড করা ইমেজ ডেটা রাখার ভ্যারিয়েবল
+
         const uploadImg = document.getElementById('uploadImg');
         const uploadLogo = document.getElementById('uploadLogo');
         const uploadAdLogo = document.getElementById('uploadAdLogo');
@@ -604,7 +609,6 @@
         const inAdText = document.getElementById('inAdText');
         const inAdExtraText = document.getElementById('inAdExtraText');
 
-        const cardImg = document.getElementById('cardImg');
         const cardLogo = document.getElementById('cardLogo');
         const cardAdLogo = document.getElementById('cardAdLogo');
         const cardAdFullImg = document.getElementById('cardAdFullImg');
@@ -676,10 +680,14 @@
         colorAdExtra.addEventListener('input', () => cardAdExtraText.style.color = colorAdExtra.value);
         sizeAdBrand.addEventListener('input', () => cardAdBrand.style.fontSize = sizeAdBrand.value + 'px');
 
+        // [ম্যাজিক ফিক্স]: ব্যাকগ্রাউন্ড ইমেজ সাইজ এবং পজিশন কন্ট্রোল করার সূত্র
         function updateImageTransform() {
-            cardImg.style.transform = `scale(${imgZoom.value})`;
-            cardImg.style.objectPosition = `${imgX.value}% ${imgY.value}%`;
-            document.getElementById('zoomVal').innerText = imgZoom.value + 'x';
+            if (!uploadedImageBase64) return;
+            
+            domImageArea.style.backgroundImage = `url('${uploadedImageBase64}')`;
+            domImageArea.style.backgroundSize = `${imgZoom.value}%`;
+            domImageArea.style.backgroundPosition = `${imgX.value}% ${imgY.value}%`;
+            document.getElementById('zoomVal').innerText = imgZoom.value + '%';
         }
         imgZoom.addEventListener('input', updateImageTransform);
         imgY.addEventListener('input', updateImageTransform);
@@ -703,9 +711,9 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    cardImg.src = e.target.result;
-                    cardImg.style.display = 'block';
+                    uploadedImageBase64 = e.target.result;
                     placeholderTxt.style.display = 'none';
+                    updateImageTransform();
                 };
                 reader.readAsDataURL(file);
             }
@@ -780,49 +788,57 @@
         window.addEventListener('load', resizePreviewCard);
         setTimeout(resizePreviewCard, 300);
 
-        // --- আপডেটকৃত হাই-কোয়ালিটি এক্সপোর্ট ইঞ্জিন ---
-        function exportResponsiveCard() {
-            const card = document.getElementById('targetCard');
+        // --- আল্ট্রা এইচডি ইমেজ এক্সপোর্ট ইঞ্জিন ---
+        function exportUltraHQExactCard() {
+            const liveCard = document.getElementById('targetCard');
+            const exportContainer = document.getElementById('hidden-export-container');
             
-            // ১. শিরোনাম প্লেসহোল্ডার ক্লিয়ারেন্স
             const isPlaceholder = cardHeadline.classList.contains('placeholder-active');
             if (isPlaceholder) cardHeadline.innerText = "";
-            
-            // ২. ফন্ট এবং ইমেজ কমপ্লিটলি লোড হওয়ার জন্য অপেক্ষা
+
             document.fonts.ready.then(() => {
-                // ৩. সিএসএস স্কেল ট্র্যান্সফর্মের বাগ এড়াতে একটি ডামি কন্টেইনার মেকানিজম ব্যবহার
-                const originalParent = card.parentNode;
-                const originalTransform = card.style.transform;
+                const clonedCard = liveCard.cloneNode(true);
+                clonedCard.id = "clonedCard";
+                clonedCard.style.transform = 'none';
+                clonedCard.style.transformOrigin = 'unset';
                 
-                // এক্সপোর্ট করার জন্য সাময়িকভাবে ট্র্যান্সফর্ম রিসেট
-                card.style.transform = 'none';
+                // ক্যলোন করা কার্ডে ব্যাকগ্রাউন্ড স্টাইল অবিকল কপি করা হচ্ছে
+                const clonedImgArea = clonedCard.querySelector('#domImageArea');
+                if (clonedImgArea) {
+                    clonedImgArea.style.backgroundImage = domImageArea.style.backgroundImage;
+                    clonedImgArea.style.backgroundSize = domImageArea.style.backgroundSize;
+                    clonedImgArea.style.backgroundPosition = domImageArea.style.backgroundPosition;
+                }
+
+                exportContainer.innerHTML = '';
+                exportContainer.appendChild(clonedCard);
                 
-                html2canvas(card, {
-                    scale: 3,                 // ৩ গুণ শার্পনেস বৃদ্ধি (Ultra HD)
-                    useCORS: true,            // ক্রস-অরিজিন ইমেজ সাপোর্ট
+                // ক্যানভাস রেন্ডারিং (৩ গুণ বড় ১৫০০×১৫০০ পিক্সেল প্রিন্ট কোয়ালিটি)
+                html2canvas(clonedCard, {
+                    scale: 3, 
+                    useCORS: true, 
                     allowTaint: false,
                     logging: false,
                     backgroundColor: null,
-                    scrollX: 0,               // স্ক্রলজনিত অফসেট ফিক্স
+                    scrollX: 0, 
                     scrollY: 0,
-                    width: 500,               // নির্দিষ্ট ফিক্সড উইডথ
-                    height: 500               // নির্দিষ্ট ফিক্সড হাইট
+                    width: 500,
+                    height: 500
                 }).then(canvas => {
-                    // ৪. ইমেজ ডাউনলোড লিংক তৈরি
                     const downloadLink = document.createElement('a');
                     downloadLink.download = 'NewsCard_1x1_' + Date.now() + '.png';
                     downloadLink.href = canvas.toDataURL('image/png');
                     downloadLink.click();
                     
-                    // ৫. কার্ডের আগের সিএসএস লেআউট ও প্রিভিউ ফিরিয়ে আনা
-                    card.style.transform = originalTransform;
+                    exportContainer.innerHTML = '';
                     if (isPlaceholder) {
                         cardHeadline.innerText = "এখানে সংবাদের মূল শিরোনাম লিখুন...";
                     }
                     resizePreviewCard();
                 }).catch(err => {
-                    console.error("Export Failed: ", err);
-                    card.style.transform = originalTransform;
+                    console.error("Export Error: ", err);
+                    exportContainer.innerHTML = '';
+                    if (isPlaceholder) cardHeadline.innerText = "এখানে সংবাদের মূল শিরোনাম লিখুন...";
                 });
             });
         }
