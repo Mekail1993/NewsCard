@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাড ইমেজ কাস্টমাইজেশনসহ ৩:৪ নিউজ ফটোকার্ড জেনারেটর</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* ফন্ট লোড */
+        @import url('https://fonts.googleapis.com/css2?family=Hind_Siliguri:wght@400;600;700&display=swap');
+
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('https://cdn.jsdelivr.net/gh/byomkesh007/bangla-fonts/Kalpurush.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'SolaimanLipi';
+            src: url('https://cdn.jsdelivr.net/gh/byomkesh007/bangla-fonts/SolaimanLipi.ttf') format('truetype');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            gap: 15px;
+            font-family: 'Kalpurush', Arial, sans-serif;
+        }
+
+        h2 {
+            font-size: 20px;
+            text-align: center;
+            color: #38bdf8;
+            margin-top: 5px;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 10px;
+        }
+
+        @media (min-width: 850px) {
+            .workspace {
+                grid-template-columns: 1.1fr 0.9fr;
+                height: calc(100vh - 80px);
+                align-items: start;
+            }
+        }
+
+        /* কন্ট্রোল প্যানেল */
+        .panel {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            border: 1px solid #334155;
+        }
+
+        @media (min-width: 850px) {
+            .panel {
+                max-height: 100%;
+                overflow-y: auto;
+            }
+        }
+
+        .panel h3 {
+            border-bottom: 2px solid #334155;
+            padding-bottom: 5px;
+            color: #38bdf8;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            padding: 10px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            border-color: #38bdf8;
+        }
+
+        .row-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .color-picker-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+
+        .color-picker-box label {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .color-picker-box input[type="color"] {
+            padding: 0;
+            width: 32px;
+            height: 28px;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .btn-remove-ad-img {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-download:active {
+            transform: scale(0.98);
+        }
+
+        /* --- ৩:৪ ফিক্সড প্রিভিউ এরিয়া --- */
+        .preview-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .photocard-3-4 {
+            width: 450px;
+            height: 600px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+            font-family: 'Kalpurush', sans-serif;
+            will-change: transform;
+        }
+
+        /* ১. ইমেজ সেকশন */
+        .news-image-area {
+            width: 100%;
+            height: 52%;
+            background-color: #334155;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-image-area img#cardImg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .watermark-logo {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            max-height: 45px;
+            max-width: 120px;
+            object-fit: contain;
+            opacity: 0.9;
+            display: none;
+            z-index: 10;
+        }
+
+        /* ২. মেটা বার */
+        .meta-bar {
+            background-color: #8b0000;
+            color: #ffffff;
+            padding: 9px 18px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* ৩. হেডলাইন সেকশন */
+        .headline-section {
+            background-color: #f8fafc;
+            padding: 15px 20px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 6px solid #8b0000;
+        }
+
+        .headline-text {
+            font-size: 24px;
+            color: #000000;
+            line-height: 1.4;
+            width: 100%;
+            word-wrap: break-word;
+        }
+
+        /* ৪. আপগ্রেডেড স্মার্ট বিজ্ঞাপন সেকশন */
+        .ad-section {
+            background-color: #ffffff;
+            height: 12%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px dashed #cbd5e1;
+        }
+
+        /* কাস্টম ফুল এড ইমেজ লেআউট */
+        .ad-full-image {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* পুরো এরিয়া জুড়ে ইমেজ সেট করার জন্য */
+            display: none;
+        }
+
+        /* ডিফল্ট টেক্সট লেআউট কনটেইনার */
+        .ad-text-wrapper {
+            width: 100%;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .ad-logo-slot {
+            width: 45px;
+            height: 45px;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .ad-logo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .ad-text-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .ad-section.has-logo .ad-text-container {
+            text-align: left;
+        }
+
+        .ad-brand {
+            font-size: 17px;
+            font-weight: bold;
+            color: #1e3a8a;
+            line-height: 1.2;
+        }
+
+        .ad-text {
+            font-size: 12px;
+            color: #16a34a;
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>স্টেবল ৩:৪ নিউজ ফটোকার্ড জেনারেটর (অ্যাড ইমেজ সাপোর্টেড)</h2>
+
+    <div class="workspace">
+        <div class="panel">
+            <h3>১. কন্টেন্ট ও টাইপোগ্রাফি</h3>
+            <div class="row-grid">
+                <div class="input-group">
+                    <label>মূল ছবি আপলোড</label>
+                    <input type="file" id="uploadImg" accept="image/*">
+                </div>
+                <div class="input-group">
+                    <label>নিуз লোগো (PNG)</label>
+                    <input type="file" id="uploadLogo" accept="image/*">
+                </div>
+            </div>
+            
+            <div class="row-grid">
+                <div class="input-group">
+                    <label>নিউজ হাউজ</label>
+                    <input type="text" id="inHouse" value="কয়রা সাংবাদিক ফোরাম">
+                </div>
+                <div class="input-group">
+                    <label>তারিখ ও বার</label>
+                    <input type="text" id="inDate" value="০৬ জুন, ২০২৬ | শনিবার">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>সংবাদের শিরোনাম</label>
+                <textarea id="inHeadline" rows="2">শাশুড়িকে হত্যা দেখতে পেয়ে দুই শিশুকেও হত্যা, আদালতে সৎ বাবার স্বীকারোক্তি</textarea>
+            </div>
+
+            <div class="row-grid">
+                <div class="input-group">
+                    <label>ফন্ট ফ্যামিলি</label>
+                    <select id="selectFont">
+                        <option value="Kalpurush" selected>কালপুরুষ (Kalpurush)</option>
+                        <option value="SolaimanLipi">সোলাইমানলিপি (SolaimanLipi)</option>
+                        <option value="Hind Siliguri">হিন্দ শিলিগুড়ি</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>শিরোনাম সাইজ</label>
+                    <input type="range" id="sizeHeadline" min="16" max="36" value="24">
+                </div>
+            </div>
+
+            <h3>②. ইমেজ পজিশন ও বেসিক কালার</h3>
+            <div class="row-grid">
+                <div class="input-group">
+                    <label>জুম: <span id="zoomVal">1.0x</span></label>
+                    <input type="range" id="imgZoom" min="1" max="2.5" step="0.05" value="1">
+                </div>
+                <div class="input-group">
+                    <label>সরান (Y-Pos)</label>
+                    <input type="range" id="imgY" min="-100" max="100" step="1" value="0">
+                </div>
+            </div>
+            <div class="row-grid">
+                <div class="color-picker-box">
+                    <label>থিম বার</label>
+                    <input type="color" id="colorTheme" value="#8b0000">
+                </div>
+                <div class="color-picker-box">
+                    <label>শিরোনাম BG</label>
+                    <input type="color" id="colorHeadlineBg" value="#f8fafc">
+                </div>
+            </div>
+
+            <h3>৩. বিজ্ঞাপন সেকশন (টেক্সট / ছবি আপলোড)</h3>
+            <div class="input-group" style="flex-direction: row; gap: 8px; align-items: center;">
+                <input type="checkbox" id="toggleAd" checked style="width: 16px; height: 16px;">
+                <label for="toggleAd" style="color: #38bdf8; cursor: pointer; font-weight: bold;">বিজ্ঞাপন ডিসপ্লে অন রাখুন</label>
+            </div>
+
+            <div id="adInputsSection" style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="input-group" style="background: #0f172a; padding: 10px; border-radius: 6px; border: 1px dashed #38bdf8;">
+                    <label style="color: #38bdf8; font-weight: bold;">বিজ্ঞাপনের ছবি (ব্যানার) আপলোড করুন</label>
+                    <input type="file" id="uploadAdImg" accept="image/*">
+                    <button class="btn-remove-ad-img" id="btnRemoveAdImg" type="button">ছবি রিমুভ করুন</button>
+                </div>
+
+                <div id="adTextInputsGroup" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="row-grid">
+                        <div class="input-group">
+                            <label>কোম্পানির নাম (Brand)</label>
+                            <input type="text" id="inAdBrand" value="কয়রা সার্জিক্যাল এন্ড ডায়াগনস্টিক সেন্টার">
+                        </div>
+                        <div class="input-group">
+                            <label>স্লোগান / বিবরণ</label>
+                            <input type="text" id="inAdText" value="নিখুঁত পরীক্ষা ও আধুনিক সেবার নির্ভরযোগ্য প্রতিষ্ঠান">
+                        </div>
+                    </div>
+
+                    <div class="row-grid">
+                        <div class="input-group">
+                            <label>ছোট ব্র্যান্ড লোগো</label>
+                            <input type="file" id="uploadAdLogo" accept="image/*">
+                        </div>
+                        <div class="input-group">
+                            <label>ব্র্যান্ড নাম সাইজ</label>
+                            <input type="range" id="sizeAdBrand" min="12" max="24" value="17">
+                        </div>
+                    </div>
+
+                    <div class="row-grid">
+                        <div class="color-picker-box">
+                            <label>বিজ্ঞাপন BG</label>
+                            <input type="color" id="colorAdBg" value="#ffffff">
+                        </div>
+                        <div class="color-picker-box">
+                            <label>ব্র্যান্ড টেক্সট</label>
+                            <input type="color" id="colorAdBrand" value="#1e3a8a">
+                        </div>
+                    </div>
+                    <div class="row-grid">
+                        <div class="color-picker-box">
+                            <label>স্লোগান টেক্সট</label>
+                            <input type="color" id="colorAdText" value="#16a34a">
+                        </div>
+                        <div class="input-group">
+                            <label>স্লোগান সাইজ</label>
+                            <input type="range" id="sizeAdText" min="10" max="18" value="12">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-download" onclick="exportResponsiveCard()">ফটোকার্ড ডাউনলোড করুন</button>
+        </div>
+
+        <div class="preview-box">
+            <span style="font-weight: 600; color: #94a3b8; font-size: 13px; margin-bottom: 10px;">লাইভ এডিটর প্রিভিউ</span>
+            
+            <div class="card-wrapper" id="cardWrapper">
+                <div class="photocard-3-4" id="targetCard">
+                    <div class="news-image-area" id="domImageArea">
+                        <img id="cardImg" src="" alt="" style="display: none;">
+                        <img id="cardLogo" class="watermark-logo" src="" alt="Logo">
+                    </div>
+                    
+                    <div class="meta-bar" id="domMetaBar">
+                        <span id="cardDate">০৬ জুন, ২০২৬ | শনিবার</span>
+                        <span id="cardHouse" style="background: rgba(255,255,255,0.18); padding: 2px 8px; border-radius: 4px;">কয়রা সাংবাদিক ফোরাম</span>
+                    </div>
+                    
+                    <div class="headline-section" id="domHeadlineSec">
+                        <div class="headline-text" id="cardHeadline">শাশুড়িকে হত্যা দেখতে পেয়ে দুই শিশুকেও হত্যা, আদালতে সৎ বাবার স্বীকারোক্তি</div>
+                    </div>
+                    
+                    <div class="ad-section" id="domAdSec">
+                        <img id="cardAdFullImg" class="ad-full-image" src="" alt="Ad Banner">
+
+                        <div class="ad-text-wrapper" id="domAdTextWrapper">
+                            <div class="ad-logo-slot" id="domAdLogoSlot">
+                                <img id="cardAdLogo" src="" alt="Ad Logo">
+                            </div>
+                            <div class="ad-text-container">
+                                <div class="ad-brand" id="cardAdBrand">কয়রা সার্জিক্যাল এন্ড ডায়াগনস্টিক সেন্টার</div>
+                                <div class="ad-text" id="cardAdText">নিখুঁত পরীক্ষা ও আধুনিক সেবার নির্ভরযোগ্য প্রতিষ্ঠান</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ডম এলিমেন্ট রেফারেন্স
+        const uploadImg = document.getElementById('uploadImg');
+        const uploadLogo = document.getElementById('uploadLogo');
+        const uploadAdLogo = document.getElementById('uploadAdLogo');
+        const uploadAdImg = document.getElementById('uploadAdImg');
+        const btnRemoveAdImg = document.getElementById('btnRemoveAdImg');
+        
+        const inHouse = document.getElementById('inHouse');
+        const inDate = document.getElementById('inDate');
+        const inHeadline = document.getElementById('inHeadline');
+        const inAdBrand = document.getElementById('inAdBrand');
+        const inAdText = document.getElementById('inAdText');
+
+        const cardImg = document.getElementById('cardImg');
+        const cardLogo = document.getElementById('cardLogo');
+        const cardAdLogo = document.getElementById('cardAdLogo');
+        const cardAdFullImg = document.getElementById('cardAdFullImg');
+        const cardHouse = document.getElementById('cardHouse');
+        const cardDate = document.getElementById('cardDate');
+        const cardHeadline = document.getElementById('cardHeadline');
+        const cardAdBrand = document.getElementById('cardAdBrand');
+        const cardAdText = document.getElementById('cardAdText');
+
+        const domImageArea = document.getElementById('domImageArea');
+        const domMetaBar = document.getElementById('domMetaBar');
+        const domHeadlineSec = document.getElementById('domHeadlineSec');
+        const domAdSec = document.getElementById('domAdSec');
+        const domAdLogoSlot = document.getElementById('domAdLogoSlot');
+        const domAdTextWrapper = document.getElementById('domAdTextWrapper');
+
+        // কন্ট্রোল এলিমেন্ট রেফারেন্স
+        const imgZoom = document.getElementById('imgZoom');
+        const imgY = document.getElementById('imgY');
+        const colorTheme = document.getElementById('colorTheme');
+        const colorHeadlineBg = document.getElementById('colorHeadlineBg');
+        
+        const toggleAd = document.getElementById('toggleAd');
+        const adInputsSection = document.getElementById('adInputsSection');
+        const adTextInputsGroup = document.getElementById('adTextInputsGroup');
+        const colorAdBg = document.getElementById('colorAdBg');
+        const colorAdBrand = document.getElementById('colorAdBrand');
+        const colorAdText = document.getElementById('colorAdText');
+        const sizeAdBrand = document.getElementById('sizeAdBrand');
+        const sizeAdText = document.getElementById('sizeAdText');
+        const selectFont = document.getElementById('selectFont');
+        const sizeHeadline = document.getElementById('sizeHeadline');
+
+        // লাইভ টেক্সট বাইন্ডিং
+        inHouse.addEventListener('input', () => cardHouse.innerText = inHouse.value);
+        inDate.addEventListener('input', () => cardDate.innerText = inDate.value);
+        inHeadline.addEventListener('input', () => cardHeadline.innerText = inHeadline.value);
+        inAdBrand.addEventListener('input', () => cardAdBrand.innerText = inAdBrand.value);
+        inAdText.addEventListener('input', () => cardAdText.innerText = inAdText.value);
+
+        // কালার ও ফন্ট সিঙ্ক
+        colorTheme.addEventListener('input', () => {
+            domMetaBar.style.backgroundColor = colorTheme.value;
+            domHeadlineSec.style.borderBottomColor = colorTheme.value;
+        });
+        colorHeadlineBg.addEventListener('input', () => domHeadlineSec.style.backgroundColor = colorHeadlineBg.value);
+        selectFont.addEventListener('change', () => document.getElementById('targetCard').style.fontFamily = `"${selectFont.value}", sans-serif`);
+        sizeHeadline.addEventListener('input', () => cardHeadline.style.fontSize = sizeHeadline.value + 'px');
+
+        // বিজ্ঞাপন ডিজাইন কন্ট্রোল
+        colorAdBg.addEventListener('input', () => domAdSec.style.backgroundColor = colorAdBg.value);
+        colorAdBrand.addEventListener('input', () => cardAdBrand.style.color = colorAdBrand.value);
+        colorAdText.addEventListener('input', () => cardAdText.style.color = colorAdText.value);
+        sizeAdBrand.addEventListener('input', () => cardAdBrand.style.fontSize = sizeAdBrand.value + 'px');
+        sizeAdText.addEventListener('input', () => cardAdText.style.fontSize = sizeAdText.value + 'px');
+
+        // ইমেজ ক্রপিং
+        function updateImageTransform() {
+            cardImg.style.transform = `scale(${imgZoom.value}) translateY(${imgY.value}px)`;
+            document.getElementById('zoomVal').innerText = imgZoom.value + 'x';
+        }
+        imgZoom.addEventListener('input', updateImageTransform);
+        imgY.addEventListener('input', updateImageTransform);
+
+        // বিজ্ঞাপন সেকশন অন/অফ
+        toggleAd.addEventListener('change', function() {
+            if (this.checked) {
+                domAdSec.style.display = 'flex';
+                domImageArea.style.height = '52%';
+                adInputsSection.style.display = 'flex';
+            } else {
+                domAdSec.style.display = 'none';
+                domImageArea.style.height = '58%';
+                adInputsSection.style.display = 'none';
+            }
+            resizePreviewCard();
+        });
+
+        /* --- 🔒 ইমেজ প্রোসেসিং ইঞ্জিন (CORS ফিক্সড) --- */
+        uploadImg.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    cardImg.src = e.target.result;
+                    cardImg.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        uploadLogo.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    cardLogo.src = e.target.result;
+                    cardLogo.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        uploadAdLogo.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    cardAdLogo.src = e.target.result;
+                    domAdLogoSlot.style.display = 'flex';
+                    domAdSec.classList.add('has-logo');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        /* --- 📢 কাস্টম বিজ্ঞাপন ইমেজ আপলোড ইঞ্জিন --- */
+        uploadAdImg.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    cardAdFullImg.src = e.target.result;
+                    cardAdFullImg.style.display = 'block'; // ইমেজ অন হবে
+                    domAdTextWrapper.style.display = 'none'; // টেক্সট অফ হবে
+                    btnRemoveAdImg.style.display = 'inline-block'; // রিমুভ বাটন শো
+                    adTextInputsGroup.style.opacity = '0.4'; // টেক্সট এডিটর ডিজেবল ফিল
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // বিজ্ঞাপন ইমেজ রিমুভ লজিক
+        btnRemoveAdImg.addEventListener('click', function() {
+            uploadAdImg.value = '';
+            cardAdFullImg.src = '';
+            cardAdFullImg.style.display = 'none';
+            domAdTextWrapper.style.display = 'flex';
+            btnRemoveAdImg.style.display = 'none';
+            adTextInputsGroup.style.opacity = '1';
+        });
+
+
+        /* স্ক্রিন ফিটিং রেসপনসিভ ইঞ্জিন */
+        function resizePreviewCard() {
+            const wrapper = document.getElementById('cardWrapper');
+            const card = document.getElementById('targetCard');
+            const wrapperWidth = wrapper.offsetWidth;
+            
+            if (wrapperWidth < 450) {
+                const scaleFactor = wrapperWidth / 450;
+                card.style.transform = `scale(${scaleFactor})`;
+                card.style.transformOrigin = 'center center';
+                wrapper.style.height = (600 * scaleFactor) + 'px';
+            } else {
+                card.style.transform = 'none';
+                wrapper.style.height = '600px';
+            }
+        }
+
+        window.addEventListener('resize', resizePreviewCard);
+        window.addEventListener('load', resizePreviewCard);
+        setTimeout(resizePreviewCard, 300);
+
+        // হাই-কোয়ালিটি এক্সপোর্ট ইঞ্জিন
+        function exportResponsiveCard() {
+            const card = document.getElementById('targetCard');
+            const currentTransform = card.style.transform;
+            card.style.transform = 'none';
+            
+            document.fonts.ready.then(() => {
+                html2canvas(card, {
+                    scale: 3, 
+                    useCORS: false,
+                    allowTaint: true,
+                    logging: false
+                }).then(canvas => {
+                    const downloadLink = document.createElement('a');
+                    downloadLink.download = 'AdImage_NewsCard_' + Date.now() + '.png';
+                    downloadLink.href = canvas.toDataURL('image/png');
+                    downloadLink.click();
+                    card.style.transform = currentTransform;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
